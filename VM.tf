@@ -29,15 +29,29 @@ resource "azurerm_network_security_group" "nsg" {
 
   security_rule {
     name                       = "Allow-SSH"
-    priority                   = 1001
+    priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "*"      # consider restricting this to your IP
+    source_address_prefix      = "74.234.218.204"      
     destination_address_prefix = "*"
   }
+
+   security_rule {
+    name                       = "Allow-ICMP"
+    priority                   = 101
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Icmp"   # VERY IMPORTANT
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+
 }
 
 # Public IP for the VM
@@ -68,12 +82,12 @@ resource "azurerm_linux_virtual_machine" "vm" {
   name                = "vm-terraform-demo-${random_integer.vm_suffix.result}"
   resource_group_name = var.rg_name
   location            = var.location
-  size                = "Standard_B1s"         # small and cheap; change if needed
+  size                = "Standard_B1s"         
   admin_username      = "azureuser"
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = file("~/.ssh/id_rsa.pub")
+    public_key = file("C:/Users/deshpani/.ssh/id_rsa.pub")
   }
 
   network_interface_ids = [azurerm_network_interface.nic.id]
@@ -95,4 +109,8 @@ resource "azurerm_linux_virtual_machine" "vm" {
     environment = "dev"
     owner       = "Aniket"
   }
+
 }
+
+
+
